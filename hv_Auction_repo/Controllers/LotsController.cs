@@ -23,16 +23,16 @@ namespace hv_Auction_repo.Controllers
 
         // GET: api/Lots
         [HttpGet]
-        public ActionResult<IEnumerable<Lot>> GetLots()
+        public async Task<IActionResult> GetLots()
         {
-            return _repositoryManager.Lot.GetAll(false).ToList();
+            return Ok(await _repositoryManager.Lot.GetAll(false));
         }
 
         // GET: api/Lots/5
         [HttpGet("{id}")]
-        public ActionResult<Lot> GetLot(int id)
+        public async Task<ActionResult<Lot>> GetLot(int id)
         {
-            var lot = _repositoryManager.Lot.GetById(id, false);
+            var lot = await _repositoryManager.Lot.GetById(id, false);
 
             if (lot == null)
             {
@@ -44,21 +44,22 @@ namespace hv_Auction_repo.Controllers
 
         //GET: api/Lots/Steps
         [HttpGet("{id}/Steps")]
-        public ActionResult<IEnumerable<Lot>> GetLotsSteps(int id)
+        public async Task<IActionResult> GetLotsSteps(int id)
         {
-            Lot lot = _repositoryManager.Lot.GetById(id, false);
+            Lot lot = await _repositoryManager.Lot.GetById(id, false);
             if (lot == null)
                 return NotFound();
 
-            var steps = _repositoryManager.Step.GetAll(false).Where(s => s.LotId == id).ToList();
-            return Ok(steps);
+            var steps = await _repositoryManager.Step.GetAll(false);
+            return Ok(steps.Where(s => s.LotId == id).ToList());
         }
 
         //GET: api/Lots/StartDate
         [HttpGet("{StartDate}/lots")]
-        public ActionResult<IEnumerable<Lot>> GetLotsByDate(DateTime StartDate)
+        public async Task<ActionResult<IEnumerable<Lot>>> GetLotsByDate(DateTime StartDate)
         {
-            return _repositoryManager.Lot.GetAll(false).Where(lot=>lot.StartDate == StartDate).ToList();
+            var lots = await _repositoryManager.Lot.GetAll(false);
+            return lots.Where(lot=>lot.StartDate == StartDate).ToList();
         }
 
         // POST: api/Lots
@@ -77,6 +78,19 @@ namespace hv_Auction_repo.Controllers
             return CreatedAtAction("GetLot", new { id = lot.Id }, lot);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutLot(int id, Lot lot)
+        {
+            Lot oldLot = await _repositoryManager.Lot.GetById(id,false);
+            if (oldLot == null)
+                return NotFound();
+
+            lot.StartPrice = oldLot.StartPrice;
+            _repositoryManager.Lot.UpdateLot(lot);
+            _repositoryManager.Save();
+            return Ok(lot);
+        }
        
     }
 }
+

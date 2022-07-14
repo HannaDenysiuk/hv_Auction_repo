@@ -39,7 +39,7 @@ namespace Repository
 
         public async Task<Client> GetById(int id, bool v)
         {
-            return FindByCondition(p => p.Id == id, v).FirstOrDefault();
+            return await FindByCondition(p => p.Id == id, v).FirstAsync();
         }
     }
 }

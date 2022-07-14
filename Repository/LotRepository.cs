@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,15 @@ namespace Repository
             Delete(lot);
         }
 
-        public IEnumerable<Lot> GetAll(bool trackChnges)
+
+        public async  Task<IEnumerable<Lot>> GetAll(bool trackChnges)
         {
-            return FindAll(trackChnges).ToList();
+            return await FindAll(trackChnges).ToListAsync();
         }
 
-        public Lot GetById(int id, bool v)
+        public async  Task<Lot> GetById(int id, bool v)
         {
-            return FindByCondition(p => p.Id == id, v).FirstOrDefault();
+            return await FindByCondition(p => p.Id == id, v).FirstAsync();
 
         }
 

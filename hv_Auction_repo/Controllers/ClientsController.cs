@@ -51,15 +51,15 @@ namespace hv_Auction_repo.Controllers
             if (client == null)
                 return NotFound();
 
-            var lots = _repositoryManager.Lot.GetAll(false).Where(lot=>lot.UserId == id).ToList();
-            return Ok(lots);
+            var lots = await _repositoryManager.Lot.GetAll(false);
+            return Ok(lots.Where(lot => lot.UserId == id));
         }
 
 
         // POST: api/Clients
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<Client> PostClient(Client client)
+        public IActionResult PostClient(Client client)
         {
             if (client == null)
             {

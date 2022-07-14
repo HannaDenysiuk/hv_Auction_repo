@@ -24,45 +24,46 @@ namespace hv_Auction_repo.Controllers
 
         // GET: api/Steps
         [HttpGet]
-        public IEnumerable<Step> GetSteps()
+        public async Task<IEnumerable<Step>> GetSteps()
         {
-            return _repositoryManager.Step.GetAll(false).ToList();
+            return await _repositoryManager.Step.GetAll(false);
         }
 
         // GET: api/Steps/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Step>> GetStep(int id)
+        public async Task<IActionResult> GetStep(int id)
         {
-            var step = _repositoryManager.Step.GetById(id, false);
+            var step = await _repositoryManager.Step.GetById(id, false);
 
             if (step == null)
             {
                 return NotFound();
             }
 
-            return step;
+            return Ok(step);
         }
 
         // POST: api/Steps
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<Step> PostStep(Step step)
+        public async Task<ActionResult<Step>> PostStep(Step step)
         {
             if (step == null)
             {
                 return BadRequest();
             }
-            List<Step> steps = _repositoryManager.Step.GetAll(false).Where(s => s.LotId == step.LotId).ToList();
-            Lot lot = _repositoryManager.Lot.GetById(step.LotId,false);
+            var steps = await _repositoryManager.Step.GetAll(false);
+            List<Step> steps1 = steps.Where(s => s.LotId == step.LotId).ToList();
+            Lot lot = await _repositoryManager.Lot.GetById(step.LotId,false);
 
-            if (steps.Count == 0 && lot.StartPrice < step.Amount)
+            if (steps.Count() == 0 && lot.StartPrice < step.Amount)
             {
                 _repositoryManager.Step.CreateStep(step);
                 _repositoryManager.Save();
 
                 return CreatedAtAction("GetStep", new { id = step.Id }, step);
             }
-            else if (steps.Count > 0)
+            else if (steps.Count() > 0)
             {
                 double sum = steps.Max(s => s.Amount);
                 if(sum > step.Amount)

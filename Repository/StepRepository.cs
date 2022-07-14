@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,14 +28,14 @@ namespace Repository
             Delete(step);
         }
 
-        public IEnumerable<Step> GetAll(bool trackChanges)
+        public async Task<IEnumerable<Step>> GetAll(bool trackChanges)
         {
-            return FindAll(trackChanges).ToList();
+            return await FindAll(trackChanges).ToListAsync();
         }
 
-        public Step GetById(int id, bool v)
+        public async Task<Step> GetById(int id, bool v)
         {
-            return FindByCondition(p => p.Id == id, v).FirstOrDefault();
+            return await FindByCondition(p => p.Id == id, v).FirstAsync();
 
         }
 
